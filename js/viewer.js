@@ -7,4 +7,4 @@ reader.onload=function(ev){
     p.innerHTML=reader.result;
     document.body.appendChild(p);
 }
-document.write('<img src="./c.png">');
+document.write('<img src="./pic.png">');
