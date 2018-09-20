@@ -1,0 +1,30 @@
+html,body {
+    margin: 0;
+    padding: 0;
+}
+header {
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+}
+.video {
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.youtube-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%;
+    overflow: hidden;
+}
+
+.youtube-wrapper > iframe
+{
+    width: 100% !important;
+    height: 100% !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
