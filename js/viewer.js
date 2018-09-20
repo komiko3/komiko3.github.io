@@ -1,6 +1,4 @@
-document.write('<img src="./pic.png">');
-
-var filename="/Resources/2018-07-21 13-30-56.txt";
+var filename="./Resources/2018-07-21 13-30-56.txt";
 var reader=new FileReader();
 reader.readAsText(filename);
 reader.onload=function(ev){
@@ -9,3 +7,4 @@ reader.onload=function(ev){
     p.innerHTML=reader.result;
     document.body.appendChild(p);
 }
+alert("oh")
