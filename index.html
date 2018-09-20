@@ -5,7 +5,8 @@
     <title>KooViewer</title>
     <meta name="viewport"
           content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
-    <link rel="stylesheet" href="index.css">
+    <!link rel="stylesheet" href="index.css">
+    <script type="text/javascript",src="viewer.js"></script>
 </head>
 <body>
 <div class="wrapper">
@@ -23,13 +24,5 @@
     <footer>
     </footer>
 </div>
-<center><form method="POST" action="cgi-bin/CommentAnalyzer.py">
-<p>
-<input type="submit" value="チャット取得">
-</p>
-</form></center>
-<center>
-<input type="range",min="0",max="1000",value="0",name="pos">
-</center>
 </body>
 </html>
