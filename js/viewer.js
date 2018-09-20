@@ -3,8 +3,8 @@ var reader=new FileReader();
 reader.readAsText(filename);
 reader.onload=function(ev){
     alert("hello");
-    var p=document.createElement('p')
+    var p=document.createElement('p');
     p.innerHTML=reader.result;
     document.body.appendChild(p);
 }
-alert("oh")
+alert("oh");
