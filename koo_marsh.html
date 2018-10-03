@@ -30,7 +30,14 @@ $(function(){
            {data:"answer"},
            {data:"retweet"},
            {data:"favorite"},
-           {data:"tweet_id"}
+           {data:"tweet_id",
+            render:fundtion(data,type,row,meta){
+                if(type=='display'){
+                    data='<a href=https://twitter.com/koo_fran_zoparstatus/'+data+'</a>';
+                }
+                return data
+            }
+           }
         ]
         });
     });
@@ -67,7 +74,7 @@ $(function(){
 　・機械的に収集したため，エラーによる抽出漏れがあるかと思われます．<br>
 　・PC以外で見るとレイアウトが崩れるかもしれません．<br>
 <b>現在の掲載状況</b><br>
-　3/26(開設)～9/25<br>
+　3/26(開設)～10/1<br>
 <br>
 </p>
     <footer>連絡：twitter @komiko_mikomi
