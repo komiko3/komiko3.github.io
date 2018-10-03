@@ -21,23 +21,23 @@ $(function(){
     
     $.getJSON("https://raw.githubusercontent.com/komiko3/komiko3.github.io/master/Resources/tweet_and_answer.json",function(jsonData){
         $('#table_id').DataTable({
-        //scrollX:true,
-        pageLength:10,
-        order:[[4,"desc"]],
-        data:jsonData,
-        columns:[
-           {data:"question"},
-           {data:"answer"},
-           {data:"retweet"},
-           {data:"favorite"},
-           {data:"tweet_id"}/*,
-            render:fundtion(data,type,row,meta){
+        //"scrollX":true,
+        "pageLength":10,
+        "order":[[4,"desc"]],
+        "data":jsonData,
+        "columns":[
+           {"data":"question"},
+           {"data":"answer"},
+           {"data":"retweet"},
+           {"data":"favorite"},
+           {"data":"tweet_id",
+            "render":function(data,type,row,meta){
                 if(type=='display'){
-                    data='<a href=https://twitter.com/koo_fran_zoparstatus/'+data+'>'+data+'</a>';
+                    data='<a href=https://twitter.com/koo_fran_zopar/status/'+data+' target=\"_brank\">'+data+'</a>';
                 }
                 return data
             }
-           }*/
+           }
         ]
         });
     });
