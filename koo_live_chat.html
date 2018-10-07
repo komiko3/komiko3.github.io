@@ -107,19 +107,22 @@ $(function(){
     });
 
     //ロード画面の処理
-var h = $(window).height();
-$('#wrap').css('display','none');
-$('#loader-bg ,#loader').height(h).css('display','block');
-$(window).on('load',function () { //全ての読み込みが完了したら実行
-    while(!isPlayerReady){}
-    $('#loader-bg').delay(900).fadeOut(800);
-    $('#loader').delay(600).fadeOut(300);
-    $('#wrap').css('display', 'block');
-});
+    var h = $(window).height();
+    $('#wrap').css('display','none');
+    $('#loader-bg ,#loader').height(h).css('display','block');
+    $(window).on('load',function () { //全ての読み込みが完了したら実行
+        while(!isPlayerReady){}
+        $('#loader-bg').delay(900).fadeOut(800);
+        $('#loader').delay(600).fadeOut(300);
+        $('#wrap').css('display', 'block');
+    });
 
     //ライブ一覧の読み込み
+console.log("load lives");
     $.getJSON("https://raw.githubusercontent.com/komiko3/komiko3.github.io/master/Resources/videodata.json",function(data){
+console.log("get json");
         for(var i in data){
+console.log(i);
             liveMap.set(data[i].date,[]);
             for(var j in data[i].videos){
                 console.log(data[i].videos[j].title);
