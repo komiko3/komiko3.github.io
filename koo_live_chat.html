@@ -88,6 +88,17 @@ function searchWord(word){
     return appearNums;
 }
 
+//ロード画面の処理
+var h = $(window).height();
+$('#wrap').css('display','none');
+$('#loader-bg ,#loader').height(h).css('display','block');
+$(window).on('load',function () { //全ての読み込みが完了したら実行
+    while(!isPlayerReady){}
+    $('#loader-bg').delay(900).fadeOut(800);
+    $('#loader').delay(600).fadeOut(300);
+    $('#wrap').css('display', 'block');
+});
+
 var liveMap=new Map(); //key:date value:[[live title,id,time(s)],...[]]
 
 $(function(){
@@ -104,17 +115,7 @@ $(function(){
         }
     });
 
-    //ロード画面の処理
-    var h = $(window).height();
-    $('#wrap').css('display','none');
-    $('#loader-bg ,#loader').height(h).css('display','block');
-
-    $(window).load(function () { //全ての読み込みが完了したら実行
-        while(!isPlayerReady){alert("loading");}
-        $('#loader-bg').delay(900).fadeOut(800);
-        $('#loader').delay(600).fadeOut(300);
-        $('#wrap').css('display', 'block');
-    });
+    
 
     //ライブ一覧の読み込み
     $.getJSON("https://raw.githubusercontent.com/komiko3/komiko3.github.io/master/Resources/videodata.json",function(data){
