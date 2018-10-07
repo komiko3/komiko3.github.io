@@ -45,7 +45,6 @@ function onYouTubeIframeAPIReady() {
 
 //プレーヤーの準備ができているかのフラグを立てる
 function onPlayerReady(event){
-    console.log("ready");
     isPlayerReady=true;
     $("#dateSelector").prop("disabled",false);
 }
@@ -131,6 +130,7 @@ console.log(i);
         }
         
     });
+console.log("loaded");
 
     $("input").val("検索する単語を入力").css("color","#CCC").one("focus",function(){
           $(this).val("").css("color","#000");
