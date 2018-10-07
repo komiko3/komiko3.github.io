@@ -1,0 +1,13 @@
+.button {
+    text-align:center;
+    padding:4px;
+    color:#fff;
+    background:#03A9F4;
+    width:120px;
+}
+.close {
+    background:#666;
+}
+ul {
+  list-style: none;
+}
