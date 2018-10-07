@@ -11,7 +11,7 @@
     <title>KooLiveChatVisualizer</title>
     <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <!script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"><!/script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.bundle.min.js"></script>
 
     <script type="text/javascript">
@@ -122,6 +122,7 @@ $(window).on('load',function () { //全ての読み込みが完了したら実�
         for(var i in data){
             liveMap.set(data[i].date,[]);
             for(var j in data[i].videos){
+                console.log(data[i].videos[j].title);
                 liveMap.get(data[i].date).push([data[i].videos[j].title,data[i].videos[j].videoId,data[i].videos[j].time]);
             }
         }
