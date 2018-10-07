@@ -19,6 +19,7 @@ chatDict={}; //key:time, value:[[time,name,text,superchat],...,[]]
 var chart;
 INTERVAL=30; //コメント数をカウントする間隔
 videoLength=0; //動画の長さ(秒)
+topVideoId="VCGazeJZY4o";
 
 // IFrame Player API の読み込み
 var tag = document.createElement('script');
@@ -34,8 +35,8 @@ function onYouTubeIframeAPIReady() {
         {
            width: 640, // プレーヤーの幅
           height: 390, // プレーヤーの高さ
-          videoId: 'i08_7estJEA', // YouTubeのID
-          origin:location.protocol+ '//' + location.hostname + "/",
+          videoId: topVideoId, // YouTubeのID
+          origin:"http://localhost:9000",
           events:{
               'onReady':onPlayerReady //プレーヤーの準備ができたときに実行時に実行
           }
@@ -172,7 +173,7 @@ console.log("loaded");
         if(val=="start"){
             $("#videoSelector").prop("disabled",true);
             $("button").prop("disabled",true);
-            ytPlayer.cueVideoById("i08_7estJEA");
+            ytPlayer.cueVideoById(topVideoId);
             chart.data["datasets"]=[];
             chart.update();
         }
