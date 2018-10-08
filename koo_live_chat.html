@@ -20,6 +20,7 @@ var chart;
 INTERVAL=30; //コメント数をカウントする間隔
 videoLength=0; //動画の長さ(秒)
 topVideoId="VCGazeJZY4o";
+firstDraw=true; //最初のグラフ描画か否か
 
 // IFrame Player API の読み込み
 var tag = document.createElement('script');
@@ -122,7 +123,7 @@ $(function(){
         for(var i in data){
             liveMap.set(data[i].date,[]);
             for(var j in data[i].videos){
-                console.log(data[i].videos[j].title);
+                //console.log(data[i].videos[j].title);
                 liveMap.get(data[i].date).push([data[i].videos[j].title,data[i].videos[j].videoId,data[i].videos[j].time]);
             }
         }
@@ -188,6 +189,14 @@ $(function(){
     $("#videoSelector").change(function(){
         var val=$(this).val();
         liveList=liveMap.get($("#dateSelector").val());
+        //前のグラフの削除
+        if(firstDraw){
+            firstDraw=false;
+        }
+        else{
+            chart.data["datasets"]=[];
+            chart.update();
+        }
         //youtube動画の読み込み
         for(var i=0;i<liveList.length;i++){
             if(liveList[i][0]==val){
