@@ -118,11 +118,8 @@ $(function(){
     });
 
     //ライブ一覧の読み込み
-console.log("load lives");
     $.getJSON("https://raw.githubusercontent.com/komiko3/komiko3.github.io/master/Resources/videodata.json",function(data){
-console.log("get json");
         for(var i in data){
-console.log(i);
             liveMap.set(data[i].date,[]);
             for(var j in data[i].videos){
                 console.log(data[i].videos[j].title);
@@ -131,7 +128,6 @@ console.log(i);
         }
         
     });
-console.log("loaded");
 
     $("input").val("検索する単語を入力").css("color","#CCC").one("focus",function(){
           $(this).val("").css("color","#000");
