@@ -224,6 +224,7 @@ $(function(){
             lines=event.target.responseText.split("\n");
             for(var i=1;i<lines.length;i++){ //1行目はラベルなので注意
                 tmp=lines[i].split("\t");
+                /*
                 chatData=[];
                 chatData.push(tmp[1]); //時間
                 chatData.push(tmp[2]); //名前
@@ -235,6 +236,8 @@ $(function(){
                     chatData.push(tmp[3]); //本文
                     chatData.push(tmp[4]); //スパチャ
                 }
+                */
+                chatData=array.filter(s=>(s!=""|s!=" "));
                 time=String(Math.floor(timeStr2second(tmp[1])/INTERVAL)*INTERVAL);
                 chatDict[time].push(chatData);
             }
