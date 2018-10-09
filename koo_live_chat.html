@@ -239,8 +239,7 @@ $(function(){
                 */
                 tmp2=tmp.filter(s=>s!="");
                 chatData=tmp2.filter(s=>s!=" ");
-console.log(chatData);
-                time=String(Math.floor(timeStr2second(tmp[1])/INTERVAL)*INTERVAL);
+                time=String(Math.floor(timeStr2second(chatData[1])/INTERVAL)*INTERVAL);
                 chatDict[time].push(chatData);
             }
             $("button").prop("disabled",false); //検索ボタン有効化
