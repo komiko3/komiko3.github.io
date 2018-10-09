@@ -239,6 +239,7 @@ $(function(){
                 */
                 tmp2=tmp.filter(s=>s!="");
                 chatData=tmp2.filter(s=>s!=" ");
+console.log(chatData[1]);
                 time=String(Math.floor(timeStr2second(chatData[1])/INTERVAL)*INTERVAL);
                 chatDict[time].push(chatData);
             }
