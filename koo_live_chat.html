@@ -237,8 +237,8 @@ $(function(){
                     chatData.push(tmp[4]); //スパチャ
                 }
                 */
-                chatData=tmp.filter(s=>(s!=""|s!=" "));
-console.log(chatData);
+                tmp2=tmp.filter(s=>s!="");
+                chatData=tmp2.filter(s=>s!=" ");
                 time=String(Math.floor(timeStr2second(tmp[1])/INTERVAL)*INTERVAL);
                 chatDict[time].push(chatData);
             }
