@@ -126,7 +126,7 @@ $(function(){
                 //console.log(data[i].videos[j].title);
                 liveMap.get(data[i].date).push([data[i].videos[j].title,data[i].videos[j].videoId,data[i].videos[j].time]);
             }
-        }console.log(liveMap.get("201810"));
+        }
         
     });
 
@@ -237,7 +237,7 @@ $(function(){
                     chatData.push(tmp[4]); //スパチャ
                 }
                 */
-                chatData=array.filter(s=>(s!=""|s!=" "));
+                chatData=tmp.filter(s=>(s!=""|s!=" "));
                 time=String(Math.floor(timeStr2second(tmp[1])/INTERVAL)*INTERVAL);
                 chatDict[time].push(chatData);
             }
