@@ -80,8 +80,7 @@ function searchWord(word){
     for(key in chatDict){
         appear=0;
         for(var i=0;i<chatDict[key].length;i++){
-console.log(chatDict[key][i][2]);
-            if(chatDict[key][i][2].indexOf(word)>-1){
+            if(chatDict[key][i][3].indexOf(word)>-1){
                 appear++;
             }
         }
