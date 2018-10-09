@@ -224,22 +224,8 @@ $(function(){
             lines=event.target.responseText.split("\n");
             for(var i=1;i<lines.length;i++){ //1行目はラベルなので注意
                 tmp=lines[i].split("\t");
-                /*
-                chatData=[];
-                chatData.push(tmp[1]); //時間
-                chatData.push(tmp[2]); //名前
-                if(tmp.length==6){ //帽子付きだと配列長6
-                    chatData.push(tmp[4]); //本文
-                    chatData.push(tmp[5]); //スパチャ
-                }
-                else{ //帽子無し
-                    chatData.push(tmp[3]); //本文
-                    chatData.push(tmp[4]); //スパチャ
-                }
-                */
-                tmp2=tmp.filter(s=>s!="");
-                chatData=tmp2.filter(s=>s!=" ");
-console.log(chatData[1]);
+                chatData=tmp.filter(s=>s!=" ").filter(s=>s!="");
+console.log(chatData);
                 time=String(Math.floor(timeStr2second(chatData[1])/INTERVAL)*INTERVAL);
                 chatDict[time].push(chatData);
             }
