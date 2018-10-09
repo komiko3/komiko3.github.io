@@ -223,7 +223,7 @@ $(function(){
             }
             lines=event.target.responseText.split("\n");
             for(var i=1;i<lines.length;i++){ //1行目はラベルなので注意
-console.log(lines[i]);
+                if(lines[i]==""){continue;} //10月以降はなぜかこれ必要
                 tmp=lines[i].split("\t");
                 chatData=tmp.filter(s=>s!=" ").filter(s=>s!="");
                 time=String(Math.floor(timeStr2second(chatData[1])/INTERVAL)*INTERVAL);
