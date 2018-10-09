@@ -126,7 +126,7 @@ $(function(){
                 //console.log(data[i].videos[j].title);
                 liveMap.get(data[i].date).push([data[i].videos[j].title,data[i].videos[j].videoId,data[i].videos[j].time]);
             }
-        }
+        }console.log(liveMap.get("201810"));
         
     });
 
@@ -320,7 +320,7 @@ $(function(){
 <li>3. 棒グラフの棒をクリックすると対象時間に飛べます<br>(動画時間が長いとクリックし辛いですがご了承を)</li>
 <li>4. 結果：かわいい！！！</li>
 <li><b>注意事項</b></li>
-<li>PCからでないと碌に使えません．</li>
+<li>PCからでないと使いづらいと思います．</li>
 <li>現在5月以降の配信のみ対応&一部データ欠損あり</li>
 <li>単語検索は一語のみ対応です．ANDやORなどの論理演算はできません．</li>
 <li>最新配信の反映はすぐに行うとは限りません．数回分まとめて更新するかも．</li>
