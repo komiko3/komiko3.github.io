@@ -54,7 +54,6 @@ function onPlayerReady(event){
 
 //00:00:00(str)形式の時間を秒(int)に変換
 function timeStr2second(target){
-console.log(target);
     tmp=target.split(":");
     h=Number(tmp[0]);
     m=Number(tmp[1]);
@@ -81,6 +80,7 @@ function searchWord(word){
     for(key in chatDict){
         appear=0;
         for(var i=0;i<chatDict[key].length;i++){
+console.log(chatDict[key][i][2]);
             if(chatDict[key][i][2].indexOf(word)>-1){
                 appear++;
             }
