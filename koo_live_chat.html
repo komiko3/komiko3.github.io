@@ -47,9 +47,9 @@ function onYouTubeIframeAPIReady() {
            width: 640, // プレーヤーの幅
           height: 390, // プレーヤーの高さ
           videoId: topVideoId, // YouTubeのID
-          //origin:"https://localhost:9000",
           playerVars:{
-              origin:lcoation.protocol+"//"+location.hostname+"/"
+              origin:"https://localhost:9000"
+              //origin:lcoation.protocol+"//"+location.hostname+"/"
           },
           events:{
               'onReady':onPlayerReady //プレーヤーの準備ができたときに実行時に実行
