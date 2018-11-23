@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns="" xml:lang="ja" lang="ja">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"/>
+    <meta http-equiv="Content-Style-Type" content="text/css"/>
+    <meta http-equiv="Content-Script-Type" content="text/javascript"/>
+    <meta charset="UTF-8">
+    <title>KooChatSearch</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdn.datatables.net/t/bs-3.3.6/jqc-1.12.0,dt-1.10.11/datatables.min.css"/> 
+    <script src="https://cdn.datatables.net/t/bs-3.3.6/jqc-1.12.0,dt-1.10.11/datatables.min.js"></script>
+<script>
+var chatList=[];
+
+//単語検索して、テーブル作成用の配列を返す
+function searchWord(word){
+    var tableText=[["配信タイトル","チャット投稿時間","チャット内容"]];
+    for(var i in chatList){if(chatList[i]["chat_text"]===undefined)console.log(chatList[i]);
+        if(Object.keys(chatList[i]).length>0 && chatList[i]["chat_text"].indexOf(word)>-1){
+            tmp=[chatList[i]["live_title"],chatList[i]["chat_time"],chatList[i]["chat_text"]];
+            tableText.push(tmp);
+        }
+    }
+    return tableText;
+}
+
+//00:00:00(str)形式の時間を秒(int)に変換
+function timeStr2second(target){
+    tmp=target.split(":");
+    h=Number(tmp[0]);
+    m=Number(tmp[1]);
+    s=Number(tmp[2]);
+    return s+m*60+h*60*60;
+}
+
+//上の逆
+function second2timeStr(target){
+    h=Math.floor(target/(60*60));
+    target-=h*60*60;
+    m=Math.floor(target/60);
+    target-=m*60;
+    s=target;
+    strH=(h<10)?"0"+String(h):String(h);
+    strM=(m<10)?"0"+String(m):String(m);
+    strS=(s<10)?"0"+String(s):String(s);
+    return strH+":"+strM+":"+strS;
+}
+
+$(function(){
+
+
+    $("input").val("検索する単語を入力").css("color","#CCC").one("focus",function(){
+          $(this).val("").css("color","#000");
+      }).blur(function(){
+          if($(this).val()==""){
+              $(this).val("検索する単語を入力").css("color","#CCC").one("focus",function(){
+                  $(this).val("").css("color","#000");
+                });
+          }
+      });
+
+    ///検索処理
+    $("button").click(function(){
+        //前のを削除
+        parent=document.getElementById("main_table");
+        //child=document.getElementById("table");
+        child=parent.childNodes[0];
+        if(child!==null){console.log(child);
+            parent.removeChild(child);
+        }
+
+        var query=$("input").val();
+        //テーブル作成
+        var tableText=searchWord(query);
+        var rows=[];
+        var table=document.createElement("table");
+        for (var i=0;i<tableText.length;i++){
+            rows.push(table.insertRow(-1));
+            for(var j=0;j<3;j++){
+                cell=rows[i].insertCell(-1);
+                cell.appendChild(document.createTextNode(tableText[i][j]));
+                if(i==0){
+                    cell.style.backgroundColor="#B0C4DE";
+                }
+                else{
+                    cell.style.backgroundColor="#FFDAB9";
+                }
+            }
+        }
+        document.getElementById("main_table").appendChild(table);
+
+    });
+
+
+
+    $("input").val("検索する単語を入力").css("color","#CCC").one("focus",function(){
+          $(this).val("").css("color","#000");
+      }).blur(function(){
+          if($(this).val()==""){
+              $(this).val("検索する単語を入力").css("color","#CCC").one("focus",function(){
+                  $(this).val("").css("color","#000");
+                });
+          }
+      });
+
+
+    //全チャットの読み込み
+    var video_map=new Map();
+    $.getJSON("https://raw.githubusercontent.com/komiko3/komiko3.github.io/master/Resources/info.json",function(data){
+        lives_element=document.getElementById("lives");
+        lives_element.appendChild(document.createTextNode("##検索対象配信##"));
+        lives_element.appendChild(document.createElement("br"));
+        for(var i in data){
+            var live_date=data[i].date;
+            var live_title=data[i].title;
+            var video_id=data[i].video_id;
+            video_map.set(video_id,live_title);
+            //var time=data[i].videos[j].time;
+            var request = new XMLHttpRequest();
+            request.open("GET", "https://raw.githubusercontent.com/komiko3/komiko3.github.io/master/Resources/chat_txt/"+video_id+".txt");
+            //チャットログ取得後の処理
+            request.addEventListener("load", (event) => {
+                if (event.target.status !== 200) {
+                    console.log(`${event.target.status}: ${event.target.statusText}`);
+                    return;
+                }
+                text=event.target.responseText;
+                if (text.length!=2){
+                lives_element.appendChild(document.createTextNode(" ・"+video_map.get(event.target.responseURL.split("/chat_txt/")[1].split(".txt")[0])));
+                lives_element.appendChild(document.createElement("br"));
+                lines=text.split("\n");
+                for(var k=1;k<lines.length;k++){ //1行目はラベルなので注意
+                    //if(lines[k]==""){continue;} //10月以降これ必要
+                    tmp=lines[k].split("\t");
+                    chatData=tmp.filter(s=>s!=" ");//.filter(s=>s!="");
+                    //var time=Math.floor(timeStr2second(chatData[1]));
+                    var map={};
+                    var live_title=video_map.get(event.target.responseURL.split("/chat_txt/")[1].split(".txt")[0]);
+                    map["live_title"]=live_title;
+                    //map["video_id"]=video_id;
+                    //map["live_date"]=live_date;
+                    map["chat_time"]=chatData[1];
+                    map["chat_text"]=chatData[3];
+                    map["chat_username"]=chatData[2];
+                    chatList.push(map);
+                }}
+            });
+            request.send();
+            
+        }
+    });    
+});
+</script>
+</head>
+
+<body>
+    <header>
+        <center><h1>Koo Chat Search</h1></center>
+    </header>
+    <center><input type="text"><button>検索</button></center>
+<br><br>
+    <center><div id="main_table">
+    </div></center>
+<br><br><br>
+    <div id="lives"></div>
+
+    <footer>連絡：twitter @komiko_mikomi
+    </footer>
+</body>
+
+
+</html>
