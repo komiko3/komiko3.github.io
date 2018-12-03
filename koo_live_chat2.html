@@ -221,7 +221,7 @@ $(function(){
             chart.update();
         }
         //youtube動画の読み込み
-        for(var i=0;i<liveList.length;i++){console.log(liveList[i]);
+        for(var i=0;i<liveList.length;i++){
             if(liveList[i][1]==val){
                 ytPlayer.cueVideoById(liveList[i][1]); //動画id
                 //videoLength=timeStr2second(liveList[i][2]); //動画時間 旧
@@ -232,7 +232,7 @@ $(function(){
         }
         //チャットログの読み込み
         var request = new XMLHttpRequest();
-        request.open("GET", "https://raw.githubusercontent.com/komiko3/komiko3.github.io/master/Resources/cat_txt/"+liveList[i][1]+".txt");
+        request.open("GET", "https://raw.githubusercontent.com/komiko3/komiko3.github.io/master/Resources/chat_txt/"+liveList[i][1]+".txt");
         //チャットログ取得後の処理
         request.addEventListener("load", (event) => {
             if (event.target.status !== 200) {
@@ -346,7 +346,6 @@ $(function(){
 <center>
 <select id="dateSelector" style="width:80px">
 <option value="start">-- 選択 --</option>
-<option value="201811">2018/12</option>
 <option value="201811">2018/11</option>
 <option value="201810">2018/10</option>
 <option value="201809">2018/9</option>
