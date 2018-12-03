@@ -143,6 +143,22 @@ $(function(){
         
     });
 
+    //ライブ一覧の読み込みnew
+    /**$.getJSON("https://raw.githubusercontent.com/komiko3/komiko3.github.io/master/Resources/infos.json",function(data){
+        for(var i in data){
+            date=data[i].date;
+            title=data[i].title;
+            video_id=data[i].video_id;
+            liveMap.set(data[i].date,[]);
+            for(var j in data[i].videos){
+                //console.log(data[i].videos[j].title);
+                liveMap.get(data[i].date).push([data[i].videos[j].title,data[i].videos[j].videoId,data[i].videos[j].time]);
+            }
+        }
+        
+    });*/
+
+    //検索ボタンの設定
     $("input").val("検索する単語を入力").css("color","#CCC").one("focus",function(){
           $(this).val("").css("color","#000");
       }).blur(function(){
@@ -152,6 +168,7 @@ $(function(){
                 });
           }
       });
+
     //検索処理
     $("button").click(function(){
         //既に検索処理が行われていたらそれをpopしてから
