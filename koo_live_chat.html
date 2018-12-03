@@ -134,6 +134,7 @@ $(function(){
 
     //ライブ一覧の読み込み
     $.getJSON("https://raw.githubusercontent.com/komiko3/komiko3.github.io/master/Resources/info.json",function(data){
+        ids=[]; //重複登録されてるのでチェック用　あとで直す
         for(var i in data){
             videoId=data[i].video_id;
             title=data[i].title;
@@ -143,8 +144,10 @@ $(function(){
                 liveMap.set(date,[]);
             }
             //console.log(data[i].title);
+            if(videoId in liveMap.get(date))
+                continue;
             liveMap.get(date).push([title,videoId]); //timeも必要
-            
+            ids.push(videoId);
         }
         //console.log("data load");
         
