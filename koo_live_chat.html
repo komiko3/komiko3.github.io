@@ -144,7 +144,7 @@ $(function(){
                 liveMap.set(date,[]);
             }
             //console.log(data[i].title);
-            if(videoId in liveMap.get(date))
+            if(videoId in ids)
                 continue;
             liveMap.get(date).push([title,videoId]); //timeも必要
             ids.push(videoId);
