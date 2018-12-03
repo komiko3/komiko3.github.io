@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html xmlns="" xml:lang="ja" lang="ja">
+
+<head>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-127891853-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-127891853-1');
+</script>
+
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"/>
+    <meta http-equiv="Content-Style-Type" content="text/css"/>
+    <meta http-equiv="Content-Script-Type" content="text/javascript"/>
+    <link rel="stylesheet" href="./css/loader.css">
+    <link rel="stylesheet" href="./css/openclose.css">
+    <meta charset="UTF-8">
+    <title>KooLiveChatVisualizer</title>
+    <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+    <!script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"><!/script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.bundle.min.js"></script>
+
+    <script type="text/javascript">
+chatDict={}; //key:time, value:[[time,name,text,superchat],...,[]]
+var chart;
+INTERVAL=30; //コメント数をカウントする間隔
+videoLength=0; //動画の長さ(秒)
+topVideoId="VCGazeJZY4o";
+firstDraw=true; //最初のグラフ描画か否か
+
+// IFrame Player API の読み込み
+var tag = document.createElement('script');
+tag.src = "https://www.youtube.com/iframe_api";
+var firstScriptTag = document.getElementsByTagName('script')[0];
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+var isPlayerReady=false;
+
+// YouTubeの埋め込み
+function onYouTubeIframeAPIReady() {
+  ytPlayer = new YT.Player(
+       'player', // 埋め込む場所の指定
+        {
+           width: 640, // プレーヤーの幅
+          height: 390, // プレーヤーの高さ
+          videoId: topVideoId, // YouTubeのID
+          playerVars:{
+              //enablejsapi:1,
+              origin:"https://localhost:9000"
+              //origin:"https://komiko3.github.io"
+          },
+          events:{
+              'onReady':onPlayerReady //プレーヤーの準備ができたときに実行時に実行
+          }
+      }
+   );
+}
+
+//プレーヤーの準備ができているかのフラグを立てる
+function onPlayerReady(event){conosle.log("ready");
+    isPlayerReady=true;
+    $("#dateSelector").prop("disabled",false);
+}
+
+
+//00:00:00(str)形式の時間を秒(int)に変換
+function timeStr2second(target){
+    tmp=target.split(":");
+    h=Number(tmp[0]);
+    m=Number(tmp[1]);
+    s=Number(tmp[2]);
+    return s+m*60+h*60*60;
+}
+
+//上の逆
+function second2timeStr(target){
+    h=Math.floor(target/(60*60));
+    target-=h*60*60;
+    m=Math.floor(target/60);
+    target-=m*60;
+    s=target;
+    strH=(h<10)?"0"+String(h):String(h);
+    strM=(m<10)?"0"+String(m):String(m);
+    strS=(s<10)?"0"+String(s):String(s);
+    return strH+":"+strM+":"+strS;
+}
+
+//単語検索して、各時間における出現回数からなる配列を返す
+function searchWord(word){
+    appearNums=[];
+    for(key in chatDict){
+        appear=0;
+        for(var i=0;i<chatDict[key].length;i++){
+            if(chatDict[key][i][3].indexOf(word)>-1){
+                appear++;
+            }
+        }
+        appearNums.push(appear);
+    }
+    return appearNums;
+}
+
+
+
+var liveMap=new Map(); //key:date value:[[live title,id,time(s)],...[]]
+
+$(function(){
+    $("button").prop("disabled",true);
+    //説明欄の処理
+    $('.button').prevAll().hide();
+    $('.button').click(function () {
+        if ($(this).prevAll().is(':hidden')) {
+            $(this).prevAll().slideDown();
+            $(this).text('閉じる').addClass('close');
+        } else {
+            $(this).prevAll().slideUp();
+            $(this).text('説明を開く').removeClass('close');
+        }
+    });
+
+    //ロード画面の処理
+    var h = $(window).height();
+    $('#wrap').css('display','none');
+    $('#loader-bg ,#loader').height(h).css('display','block');
+    $(window).on('load',function () { //全ての読み込みが完了したら実行
+        while(!isPlayerReady){}
+        $('#loader-bg').delay(900).fadeOut(800);
+        $('#loader').delay(600).fadeOut(300);
+        $('#wrap').css('display', 'block');
+    });
+
+    //ライブ一覧の読み込み
+    $.getJSON("https://raw.githubusercontent.com/komiko3/komiko3.github.io/master/Resources/info.json",function(data){
+        for(var i in data){
+            videoId=data[i].video_id;
+            title=data[i].title;
+            date_tmp=data[i].date.split("-");
+            date=date_tmp[0]+date_tmp[1];
+            if(!liveMap.has(date)){
+                liveMap.set(date,[]);
+            }
+            //console.log(data[i].title);
+            liveMap.get(date).push([title,videoId]); //timeも必要
+            
+        }
+        //console.log("data load");
+        
+    });
+
+
+    //検索ボタンの設定
+    $("input").val("検索する単語を入力").css("color","#CCC").one("focus",function(){
+          $(this).val("").css("color","#000");
+      }).blur(function(){
+          if($(this).val()==""){
+              $(this).val("検索する単語を入力").css("color","#CCC").one("focus",function(){
+                  $(this).val("").css("color","#000");
+                });
+          }
+      });
+
+    //検索処理
+    $("button").click(function(){
+        //既に検索処理が行われていたらそれをpopしてから
+        if(chart.data["datasets"].length>1){
+            chart.data["datasets"].pop();
+        }
+        chart.update();
+
+        var query=$("input").val();
+        wordCount=searchWord(query);
+        //console.log(wordCount);
+        pushData={
+            type:"line",
+            label:"Num of \""+query+"\"",
+            data:wordCount,
+            borderColor : "rgba(54,164,235,0.8)",
+            backgroundColor : "rgba(54,164,235,0.5)"
+        }
+        chart.data["datasets"].push(pushData);
+        chart.update();
+    });
+
+    $("#dateSelector").prop("disabled",true);
+    $("#videoSelector").prop("disabled",true);
+
+    //年月選択後の処理
+    $("#dateSelector").change(function(){
+        var val=$(this).val();
+        if(val=="start"){
+            $("#videoSelector").prop("disabled",true);
+            $("button").prop("disabled",true);
+            ytPlayer.cueVideoById(topVideoId);
+            chart.data["datasets"]=[];
+            chart.update();
+        }
+        else{
+            $("#videoSelector").prop("disabled",false);
+        }
+        $("#videoSelector").children().remove();//一旦全部削除
+        liveList=liveMap.get(val);
+        for(var i=0;i < liveList.length;i++){
+            $("#videoSelector").append($("<option>").val(liveList[i][1]).text(liveList[i][0]));
+        }
+        $("#videoSelector").val(1);
+    });
+
+    //ライブ選択後の処理
+    $("#videoSelector").change(function(){
+        var val=$(this).val();
+        liveList=liveMap.get($("#dateSelector").val());
+        //前のグラフの削除
+        if(firstDraw){
+            firstDraw=false;
+        }
+        else{
+            chart.data["datasets"]=[];
+            chart.update();
+        }
+        //youtube動画の読み込み
+        for(var i=0;i<liveList.length;i++){
+            if(liveList[i][0]==val){
+                ytPlayer.cueVideoById(liveList[i][1]); //動画id
+                videoLength=timeStr2second(liveList[i][2]); //動画時間
+                ytPlayer.playVideo(); //一回再生＆停止をしないとジャンプ機能がスムーズにできない
+                //ytPlayer.pauseVideo();
+                break;
+            }
+        }
+        //チャットログの読み込み
+        var request = new XMLHttpRequest();
+        request.open("GET", "https://raw.githubusercontent.com/komiko3/komiko3.github.io/master/Resources/cat_txt/"+liveList[i][1]+".txt");
+        //チャットログ取得後の処理
+        request.addEventListener("load", (event) => {
+            if (event.target.status !== 200) {
+                console.log(`${event.target.status}: ${event.target.statusText}`);
+                return;
+            }
+            
+            n=Math.floor(videoLength/INTERVAL)+1;
+            for(var i=0;i<n;i++){
+                chatDict[String(i*INTERVAL)]=[];
+            }
+            lines=event.target.responseText.split("\n");
+            for(var i=1;i<lines.length;i++){ //1行目はラベルなので注意
+                if(lines[i]==""){continue;} //10月以降はなぜかこれ必要
+                tmp=lines[i].split("\t");
+                chatData=tmp.filter(s=>s!=" ").filter(s=>s!="");
+                time=String(Math.floor(timeStr2second(chatData[1])/INTERVAL)*INTERVAL);
+                chatDict[time].push(chatData);
+            }
+            $("button").prop("disabled",false); //検索ボタン有効化
+            //ラベル(時間)の作成
+            labelData=[]
+            for(var i=0;i<n;i++){
+                labelData.push(second2timeStr(Number(i*INTERVAL)));
+            }
+            //チャットのカウント
+            chatNums=[];
+            for(key in chatDict){
+                chatNums.push(chatDict[key].length);
+            }
+            //console.log(chatNums);
+            //チャート生成
+            var barChartData={
+                labels:labelData,
+                datasets:[{
+                    type:"bar",
+                    label:"Num of Chat",
+                    data:chatNums,
+                    borderColor : "rgba(254,97,132,0.8)",
+                    backgroundColor : "rgba(254,97,132,0.5)"
+                }]
+            }
+            ctx=document.getElementById("canvas").getContext("2d");
+            chart=new Chart(ctx,{
+                type:"bar",
+                data:barChartData,
+                options:{
+                    responsive:true,
+                    scales:{
+                        xAxes: [{
+                            ticks: {
+                                callback: function(value,index,values){
+                                    if(index%2==1){return "";}
+                                    return value;
+                                },
+                                //min: 0,
+                                //max: 50,
+                                //stepSize: 1
+                            }
+                        }]
+                    },
+                    onClick:function(evt){
+                        var activePoints = chart.getElementsAtEvent(evt);
+                        if(activePoints.length >0){ //バーの部分をクリックしたら
+                            var clickedElementindex = activePoints[0]["_index"];
+                            //対象の時間にジャンプ
+                            ytPlayer.seekTo(clickedElementindex*INTERVAL);
+                        }
+                    }
+                }
+            });
+        });
+        request.send();
+    });
+
+});
+</script>
+</head>
+
+<body>
+<div id="loader-bg">
+  <div id="loader">
+    <img src="./Resources/Img/loading.gif" width="80" height="80" alt="Now Loading..." />
+    <p>Now Loading...</p>
+  </div>
+</div>
+<div id="wrap">
+<center><h1>Koo Live Chat Visualizer</h1></center>
+<center><div class="content">
+<ul>
+<li><b>このサイトについて</b></li>
+<li>クゥ姉ちゃんの配信で書き込まれたチャットの数を可視化します．</li>
+<li>また，特定のワードを含むチャットの数を検索することができ，見どころを探すのに活用できます．<br>(例：「かわいい」「おうた」「草」など)<li>
+<li><s>チャットログはこちらのサイトのものを利用しています：http://mamedaifuku.sakura.ne.jp/live_stream/html/</s></li>
+<li>チャットログは自分で収集することにしました．</li>
+<li><b>使い方</b></li>
+<li>1. 年月を選択</li>
+<li>2. 配信を選択するとページ下部にグラフが出ます</li>
+<li>2.1. 単語を入力して「検索」</li>
+<li>3. 棒グラフの棒をクリックすると対象時間に飛べます<br>(動画時間が長いとクリックし辛いですがご了承を)</li>
+<li>4. 結果：かわいい！！！</li>
+<li><b>注意事項</b></li>
+<li>PCからでないと使いづらいと思います．</li>
+<li>現在5月以降の配信のみ対応&一部データ欠損あり</li>
+<li>単語検索は一語のみ対応です．ANDやORなどの論理演算はできません．</li>
+<li>最新配信の反映はすぐに行うとは限りません．数回分まとめて更新するかも．</li>
+<li><br>連絡：twitter @komiko_mikomi</li>
+</ul>
+<p class="button">説明を開く</p>
+</div></center>
+<center>
+<select id="dateSelector" style="width:80px">
+<option value="start">-- 選択 --</option>
+<option value="201811">2018/12</option>
+<option value="201811">2018/11</option>
+<option value="201810">2018/10</option>
+<option value="201809">2018/9</option>
+<option value="201808">2018/8</option>
+<option value="201807">2018/7</option>
+<option value="201806">2018/6</option>
+<option value="201805">2018/5</option>
+<option value="201805">2018/4</option>
+<option value="201805">2018/3</option>
+<option value="201805">2018/2</option>
+<option value="201805">2018/1</option>
+</select>
+<select id="videoSelector" style="width:400px">
+</select>
+</center><br>
+<center><div id="player"></div></center>
+<center><input type="text"><button>検索</button></center>
+<center><div class="container">
+<canvas id="canvas"></canvas></div></center>
+</div>
+</body>
+
+
+</html>
