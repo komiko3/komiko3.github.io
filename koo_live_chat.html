@@ -247,72 +247,69 @@ $(function(){
                 alert("チャットが取得できません");
             }
             else{
-            lines=event.target.responseText.split("\n"); //1行1チャットで読み込み
-            videoLength=timeStr2second(lines[lines.length-1].split("\t")[1]) //動画時間　新　一番最後のチャットの時間をもとにする
-            n=Math.floor(videoLength/INTERVAL)+1;
-            for(var i=0;i<n;i++){
-                chatDict[String(i*INTERVAL)]=[];
-            }
-            for(var i=1;i<lines.length;i++){ //1行目はラベルなので注意
-                //if(lines[i]==""){continue;} //10月以降はなぜかこれ必要
-                tmp=lines[i].split("\t");
-                chatData=tmp.filter(s=>s!=" ").filter(s=>s!="");
-                time=String(Math.floor(timeStr2second(chatData[1])/INTERVAL)*INTERVAL);
-                chatDict[time].push(chatData);
-            }
-            $("button").prop("disabled",false); //検索ボタン有効化
-            //ラベル(時間)の作成
-            labelData=[]
-            for(var i=0;i<n;i++){
-                labelData.push(second2timeStr(Number(i*INTERVAL)));
-            }
-            //チャットのカウント
-            chatNums=[];
-            for(key in chatDict){
-                chatNums.push(chatDict[key].length);
-            }
-            //console.log(chatNums);
-            //チャート生成
-            var barChartData={
-                labels:labelData,
-                datasets:[{
+                lines=event.target.responseText.split("\n"); //1行1チャットで読み込み
+                videoLength=timeStr2second(lines[lines.length-1].split("\t")[1]) //動画時間　新　一番最後のチャットの時間をもとにする
+                n=Math.floor(videoLength/INTERVAL)+1;
+                for(var i=0;i<n;i++){
+                    chatDict[String(i*INTERVAL)]=[];
+                }
+                for(var i=1;i<lines.length;i++){ //1行目はラベルなので注意
+                    //if(lines[i]==""){continue;} //10月以降はなぜかこれ必要
+                    tmp=lines[i].split("\t");
+                    chatData=tmp.filter(s=>s!=" ").filter(s=>s!="");
+                    time=String(Math.floor(timeStr2second(chatData[1])/INTERVAL)*INTERVAL);
+                    chatDict[time].push(chatData);
+                }
+                $("button").prop("disabled",false); //検索ボタン有効化
+                //ラベル(時間)の作成
+                labelData=[]
+                for(var i=0;i<n;i++){
+                    labelData.push(second2timeStr(Number(i*INTERVAL)));
+                }
+                //チャットのカウント
+                chatNums=[];
+                for(key in chatDict){
+                    chatNums.push(chatDict[key].length);
+                }
+                //console.log(chatNums);
+                //チャート生成
+                var barChartData={
+                    labels:labelData,
+                    datasets:[{
+                        type:"bar",
+                        label:"Num of Chat",
+                        data:chatNums,
+                        borderColor : "rgba(254,97,132,0.8)",
+                        backgroundColor : "rgba(254,97,132,0.5)"
+                    }]
+                }
+                ctx=document.getElementById("canvas").getContext("2d");
+                chart=new Chart(ctx,{
                     type:"bar",
-                    label:"Num of Chat",
-                    data:chatNums,
-                    borderColor : "rgba(254,97,132,0.8)",
-                    backgroundColor : "rgba(254,97,132,0.5)"
-                }]
-            }
-            ctx=document.getElementById("canvas").getContext("2d");
-            chart=new Chart(ctx,{
-                type:"bar",
-                data:barChartData,
-                options:{
-                    responsive:true,
-                    scales:{
-                        xAxes: [{
-                            ticks: {
-                                callback: function(value,index,values){
-                                    if(index%2==1){return "";}
-                                    return value;
-                                },
-                                //min: 0,
-                                //max: 50,
-                                //stepSize: 1
+                    data:barChartData,
+                    options:{
+                        responsive:true,
+                        scales:{
+                            xAxes: [{
+                                ticks: {
+                                    callback: function(value,index,values){
+                                        if(index%2==1){return "";}
+                                        return value;
+                                    },
+                                }
+                            }]
+                        },
+                        onClick:function(evt){
+                            var activePoints = chart.getElementsAtEvent(evt);
+                            if(activePoints.length >0){ //バーの部分をクリックしたら
+                                var clickedElementindex = activePoints[0]["_index"];
+                                //対象の時間にジャンプ
+                                ytPlayer.seekTo(clickedElementindex*INTERVAL);
                             }
-                        }]
-                    },
-                    onClick:function(evt){
-                        var activePoints = chart.getElementsAtEvent(evt);
-                        if(activePoints.length >0){ //バーの部分をクリックしたら
-                            var clickedElementindex = activePoints[0]["_index"];
-                            //対象の時間にジャンプ
-                            ytPlayer.seekTo(clickedElementindex*INTERVAL);
                         }
                     }
-                }
+                });
             }
-            });
         });
         request.send();
     });
