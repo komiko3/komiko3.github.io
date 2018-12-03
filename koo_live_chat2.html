@@ -221,11 +221,10 @@ $(function(){
             chart.update();
         }
         //youtube動画の読み込み
-        console.log(val);
         for(var i=0;i<liveList.length;i++){console.log(liveList[i]);
-            if(liveList[i][0]==val){
+            if(liveList[i][1]==val){
                 ytPlayer.cueVideoById(liveList[i][1]); //動画id
-                //videoLength=timeStr2second(liveList[i][2]); //動画時間
+                //videoLength=timeStr2second(liveList[i][2]); //動画時間 旧
                 ytPlayer.playVideo(); //一回再生＆停止をしないとジャンプ機能がスムーズにできない
                 //ytPlayer.pauseVideo();
                 break;
@@ -240,14 +239,14 @@ $(function(){
                 console.log(`${event.target.status}: ${event.target.statusText}`);
                 return;
             }
-            
+            lines=event.target.responseText.split("\n"); //1行1チャットで読み込み
+            videoLength=timeStr2second(lines[lines.length-1].split("\t")[1]) //動画時間　新　一番最後のチャットの時間をもとにする
             n=Math.floor(videoLength/INTERVAL)+1;
             for(var i=0;i<n;i++){
                 chatDict[String(i*INTERVAL)]=[];
             }
-            lines=event.target.responseText.split("\n");
             for(var i=1;i<lines.length;i++){ //1行目はラベルなので注意
-                if(lines[i]==""){continue;} //10月以降はなぜかこれ必要
+                //if(lines[i]==""){continue;} //10月以降はなぜかこれ必要
                 tmp=lines[i].split("\t");
                 chatData=tmp.filter(s=>s!=" ").filter(s=>s!="");
                 time=String(Math.floor(timeStr2second(chatData[1])/INTERVAL)*INTERVAL);
