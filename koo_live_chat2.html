@@ -221,8 +221,9 @@ $(function(){
             chart.update();
         }
         //youtube動画の読み込み
-        for(var i=0;i<liveList.length;i++){
-            if(liveList[i][0]==val){console.log(val);
+        console.log(val);
+        for(var i=0;i<liveList.length;i++){console.log(liveList[i]);
+            if(liveList[i][0]==val){
                 ytPlayer.cueVideoById(liveList[i][1]); //動画id
                 //videoLength=timeStr2second(liveList[i][2]); //動画時間
                 ytPlayer.playVideo(); //一回再生＆停止をしないとジャンプ機能がスムーズにできない
