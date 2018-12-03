@@ -243,6 +243,10 @@ $(function(){
                 console.log(`${event.target.status}: ${event.target.statusText}`);
                 return;
             }
+　　　　　　　　　　　　if(event.target.responseText.length==2){ //取得できてない奴
+                alert("チャットが取得できません");
+            }
+            else{
             lines=event.target.responseText.split("\n"); //1行1チャットで読み込み
             videoLength=timeStr2second(lines[lines.length-1].split("\t")[1]) //動画時間　新　一番最後のチャットの時間をもとにする
             n=Math.floor(videoLength/INTERVAL)+1;
@@ -307,6 +311,7 @@ $(function(){
                         }
                     }
                 }
+            }
             });
         });
         request.send();
@@ -340,7 +345,7 @@ $(function(){
 <li>4. 結果：かわいい！！！</li>
 <li><b>注意事項</b></li>
 <li>PCからでないと使いづらいと思います．</li>
-<li>現在5月以降の配信のみ対応&一部データ欠損あり</li>
+<li>チャットの取得が出来ない配信あり．</li>
 <li>単語検索は一語のみ対応です．ANDやORなどの論理演算はできません．</li>
 <li>最新配信の反映はすぐに行うとは限りません．数回分まとめて更新するかも．</li>
 <li><br>連絡：twitter @komiko_mikomi</li>
@@ -361,7 +366,6 @@ $(function(){
 <option value="201804">2018/4</option>
 <option value="201803">2018/3</option>
 <option value="201802">2018/2</option>
-<option value="201801">2018/1</option>
 </select>
 <select id="videoSelector" style="width:400px">
 </select>
