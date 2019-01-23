@@ -138,7 +138,7 @@ $(function(){
         for(var i in data){
             videoId=data[i].video_id;
             title=data[i].title;
-            date_tmp=data[i].date.split("-");
+            date_tmp=data[i].date.split("-"); //時間は2018-01-01T10:30:10.000Z って形
             date=date_tmp[0]+date_tmp[1];
             if(!liveMap.has(date)){
                 liveMap.set(date,[]);
@@ -248,7 +248,7 @@ $(function(){
             }
             else{
                 lines=event.target.responseText.split("\n"); //1行1チャットで読み込み
-                videoLength=timeStr2second(lines[lines.length-1].split("\t")[1]) //動画時間　新　一番最後のチャットの時間をもとにする
+                videoLength=timeStr2second(lines[lines.length-1].split("\t")[1]) //動画時間　なんか取ってこれないのでとりあえず一番最後のチャットの時間をもとにする
                 n=Math.floor(videoLength/INTERVAL)+1;
                 for(var i=0;i<n;i++){
                     chatDict[String(i*INTERVAL)]=[];
